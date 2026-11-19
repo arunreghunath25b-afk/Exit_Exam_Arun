@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Predict Pokémon Type & Combat Tier - PokéML{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <!-- Page Header -->
+            <div class="text-center mb-4">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-danger bg-opacity-25 border border-danger border-opacity-50 text-danger-emphasis mb-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span class="small fw-bold text-uppercase">Pokédex Predictive Engine</span>
+                </div>
+                <h2 class="display-6 fw-bold text-white mb-2">Pokémon Attribute & Type Predictor</h2>
+                <p class="text-secondary">
+                    Enter the physiological and combat metrics below. The trained <strong>Random Forest</strong> model will classify the combat power tier and analyze elemental type resonance.
+                </p>
+            </div>
+
+            {% if error %}
+            <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm" role="alert">
+                <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ error }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endif %}
+
+            <!-- Quick Load Presets Toolbar -->
+            <div class="card bg-dark bg-opacity-75 border border-secondary border-opacity-25 rounded-4 p-3 mb-4 shadow-sm">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                    <span class="small fw-bold text-secondary text-uppercase">
+                        <i class="fa-solid fa-bolt text-warning me-1"></i> Quick Test Presets:
+                    </span>
+                    <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-3" id="btn-random">
+                        <i class="fa-solid fa-dice me-1"></i> Randomize Stats
+                    </button>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-light preset-btn rounded-pill"
+                            data-hp="45" data-attack="49" data-defense="49" data-height="7" data-weight="69" data-exp="64" data-type1="grass" data-type2="poison">
+                        🌱 Bulbasaur
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-light preset-btn rounded-pill"
+                            data-hp="35" data-attack="55" data-defense="40" data-height="4" data-weight="60" data-exp="112" data-type1="electric" data-type2="none">
+                        ⚡ Pikachu
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-light preset-btn rounded-pill"
+                            data-hp="78" data-attack="84" data-defense="78" data-height="17" data-weight="905" data-exp="240" data-type1="fire" data-type2="flying">
+                        🔥 Charizard
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-light preset-btn rounded-pill"
+                            data-hp="160" data-attack="110" data-defense="65" data-height="21" data-weight="4600" data-exp="189" data-type1="normal" data-type2="none">
+                        💤 Snorlax
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-light preset-btn rounded-pill"
+                            data-hp="60" data-attack="65" data-defense="60" data-height="15" data-weight="405" data-exp="225" data-type1="ghost" data-type2="poison">
+                        👻 Gengar
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-light preset-btn rounded-pill"
+                            data-hp="108" data-attack="130" data-defense="95" data-height="19" data-weight="950" data-exp="270" data-type1="dragon" data-type2="ground">
+                        🐉 Garchomp
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-light preset-btn rounded-pill"
+                            data-hp="106" data-attack="110" data-defense="90" data-height="20" data-weight="1220" data-exp="340" data-type1="psychic" data-type2="none">
+                        🔮 Mewtwo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Prediction Form Card -->
+            <div class="card bg-dark bg-opacity-75 border border-secondary border-opacity-25 rounded-4 p-4 p-lg-5 shadow-lg">
+                <form action="{{ url_for('predict') }}" method="POST" id="prediction-form">
+                    
+                    <h5 class="fw-bold mb-3 text-light d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-chart-simple text-danger"></i> Core Battle & Physical Stats
+                    </h5>
+
+                    <div class="row g-4">
+                        <!-- HP Input -->
+                        <div class="col-md-4">
+                            <label for="hp" class="form-label fw-bold text-light d-flex justify-content-between">
+                                <span><i class="fa-solid fa-heart-pulse text-danger me-1"></i> HP (Hit Points)</span>
+                                <span class="badge bg-secondary" id="badge-hp">65</span>
+                            </label>
+                            <input type="number" step="any" min="1" max="300" class="form-control form-control-lg bg-dark text-light border-secondary border-opacity-50"
+                                   id="hp" name="hp" value="65" required placeholder="e.g. 65">
+                            <div class="form-text text-secondary small">Range: 1 – 255 (Avg: ~69)</div>
+                        </div>
+
+                        <!-- Attack Input -->
+                        <div class="col-md-4">
+                            <label for="attack" class="form-label fw-bold text-light d-flex justify-content-between">
+                                <span><i class="fa-solid fa-burst text-warning me-1"></i> Attack Stat</span>
+                                <span class="badge bg-secondary" id="badge-attack">75</span>
+                            </label>
+                            <input type="number" step="any" min="5" max="250" class="form-control form-control-lg bg-dark text-light border-secondary border-opacity-50"
+                                   id="attack" name="attack" value="75" required placeholder="e.g. 75">
+                            <div class="form-text text-secondary small">Range: 5 – 190 (Avg: ~78)</div>
+                        </div>
+
+                        <!-- Defense Input -->
+                        <div class="col-md-4">
+                            <label for="defense" class="form-label fw-bold text-light d-flex justify-content-between">
+                                <span><i class="fa-solid fa-shield text-info me-1"></i> Defence Stat</span>
+                                <span class="badge bg-secondary" id="badge-defense">70</span>
+                            </label>
+                            <input type="number" step="any" min="5" max="250" class="form-control form-control-lg bg-dark text-light border-secondary border-opacity-50"
+                                   id="defense" name="defense" value="70" required placeholder="e.g. 70">
+                            <div class="form-text text-secondary small">Range: 5 – 230 (Avg: ~74)</div>
+                        </div>
+
+                        <!-- Height Input -->
+                        <div class="col-md-4">
+                            <label for="height" class="form-label fw-bold text-light d-flex justify-content-between">
+                                <span><i class="fa-solid fa-ruler-vertical text-success me-1"></i> Height (dm)</span>
+                                <span class="badge bg-secondary" id="badge-height">10 dm (1.0m)</span>
+                            </label>
+                            <input type="number" step="any" min="1" max="200" class="form-control form-control-lg bg-dark text-light border-secondary border-opacity-50"
+                                   id="height" name="height" value="10" required placeholder="e.g. 10">
+                            <div class="form-text text-secondary small">Decimeters: 10 dm = 1.0 meter</div>
+                        </div>
+
+                        <!-- Weight Input -->
+                        <div class="col-md-4">
+                            <label for="weight" class="form-label fw-bold text-light d-flex justify-content-between">
+                                <span><i class="fa-solid fa-weight-hanging text-secondary me-1"></i> Weight (hg)</span>
+                                <span class="badge bg-secondary" id="badge-weight">500 hg (50kg)</span>
+                            </label>
+                            <input type="number" step="any" min="1" max="9999" class="form-control form-control-lg bg-dark text-light border-secondary border-opacity-50"
+                                   id="weight" name="weight" value="500" required placeholder="e.g. 500">
+                            <div class="form-text text-secondary small">Hectograms: 100 hg = 10 kg</div>
+                        </div>
+
+                        <!-- Base Experience Input -->
+                        <div class="col-md-4">
+                            <label for="base_experience" class="form-label fw-bold text-light d-flex justify-content-between">
+                                <span><i class="fa-solid fa-star text-warning me-1"></i> Base Experience</span>
+                                <span class="badge bg-secondary" id="badge-exp">140</span>
+                            </label>
+                            <input type="number" step="any" min="30" max="650" class="form-control form-control-lg bg-dark text-light border-secondary border-opacity-50"
+                                   id="base_experience" name="base_experience" value="140" required placeholder="e.g. 140">
+                            <div class="form-text text-secondary small">Range: 36 – 608 (Avg: ~154)</div>
+                        </div>
+                    </div>
+
+                    <!-- Collapsible Advanced Options (Types) -->
+                    <div class="my-4 pt-3 border-top border-secondary border-opacity-25">
+                        <a class="text-decoration-none text-light d-inline-flex align-items-center gap-2 fw-semibold"
+                           data-bs-toggle="collapse" href="#advancedOptions" role="button" aria-expanded="false">
+                            <i class="fa-solid fa-sliders text-danger"></i>
+                            <span>Advanced Preprocessor Settings (Optional Pokémon Types)</span>
+                            <i class="fa-solid fa-chevron-down small text-secondary"></i>
+                        </a>
+
+                        <div class="collapse mt-3" id="advancedOptions">
+                            <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                                <p class="text-secondary small mb-3">
+                                    <i class="fa-solid fa-circle-info text-info me-1"></i>
+                                    The original model preprocessor was trained with Type-1 and Type-2 features. You may select them here or leave as <strong>Auto-detect</strong>.
+                                </p>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="type_1" class="form-label small text-secondary">Primary Type (Type 1):</label>
+                                        <select class="form-select bg-dark text-light border-secondary border-opacity-50" id="type_1" name="type_1">
+                                            <option value="auto" selected>✨ Auto-detect / From Stats</option>
+                                            {% for key, val in all_types.items() %}
+                                                <option value="{{ key }}">{{ val.icon }} {{ val.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="type_2" class="form-label small text-secondary">Secondary Type (Type 2):</label>
+                                        <select class="form-select bg-dark text-light border-secondary border-opacity-50" id="type_2" name="type_2">
+                                            <option value="none" selected>None (No secondary type)</option>
+                                            {% for key, val in all_types.items() %}
+                                                <option value="{{ key }}">{{ val.icon }} {{ val.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stat Total Live Bar -->
+                    <div class="stat-summary-bar p-3 rounded-3 bg-dark border border-secondary border-opacity-25 mb-4 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-calculator text-danger"></i>
+                            <span class="text-secondary small">Combined Combat Total (HP + Atk + Def):</span>
+                            <span class="fw-bold fs-5 text-light" id="total-stats">210</span>
+                        </div>
+                        <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25" id="stat-tier-hint">
+                            Balanced Tier
+                        </span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger btn-lg py-3 rounded-pill fw-bold shadow-lg d-flex align-items-center justify-content-center gap-2">
+                            <span class="pokeball-icon-sm"></span> Predict Pokémon Type & Attack Tier
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

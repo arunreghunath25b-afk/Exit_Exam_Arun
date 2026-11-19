@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Project Overview - Pokémon ML Studio{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row align-items-center my-4 py-4 g-4 hero-card rounded-4 p-4 p-lg-5 shadow-lg position-relative overflow-hidden">
+        <div class="col-lg-7 position-relative z-1">
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-danger bg-opacity-25 border border-danger border-opacity-50 text-danger-emphasis mb-3">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span class="small fw-bold text-uppercase tracking-wider">Exit Exam Project Showcase</span>
+            </div>
+            <h1 class="display-4 fw-extrabold text-white mb-3">
+                Pokémon Classification & <span class="text-gradient-pokemon">Predictive Analytics</span>
+            </h1>
+            <p class="lead text-light text-opacity-75 mb-4">
+                An end-to-end Machine Learning system trained on <strong>1,351 Pokémon</strong> to analyze biological metrics, combat attributes, and predict <strong>Attack Power Classification & Elemental Types</strong>.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="{{ url_for('predict') }}" class="btn btn-danger btn-lg px-4 rounded-pill shadow-sm d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Launch Prediction Form
+                </a>
+                <a href="#pipeline" class="btn btn-outline-light btn-lg px-4 rounded-pill">
+                    <i class="fa-solid fa-code-fork me-2"></i> Explore ML Pipeline
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-5 text-center position-relative z-1">
+            <div class="pokedex-glass-card p-4 rounded-4 shadow border border-light border-opacity-10">
+                <div class="d-flex justify-content-between align-items-center border-bottom border-secondary border-opacity-25 pb-3 mb-3">
+                    <span class="badge bg-danger rounded-pill px-3 py-2"><i class="fa-solid fa-microchip me-1"></i> Best Model</span>
+                    <span class="text-success fw-bold"><i class="fa-solid fa-circle-check me-1"></i> Tuned RF</span>
+                </div>
+                <div class="row g-3 text-start">
+                    <div class="col-6">
+                        <div class="metric-box p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                            <span class="text-secondary small d-block">Test Accuracy</span>
+                            <span class="fs-3 fw-bold text-light">68.63%</span>
+                            <span class="small text-success d-block"><i class="fa-solid fa-arrow-up"></i> Top Score</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-box p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                            <span class="text-secondary small d-block">Macro F1-Score</span>
+                            <span class="fs-3 fw-bold text-danger">0.6806</span>
+                            <span class="small text-danger d-block">Balanced Evaluation</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-box p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                            <span class="text-secondary small d-block">Macro Precision</span>
+                            <span class="fs-4 fw-bold text-warning">0.6817</span>
+                            <span class="small text-muted d-block">Low False Positives</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-box p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                            <span class="text-secondary small d-block">Macro Recall</span>
+                            <span class="fs-4 fw-bold text-info">0.6825</span>
+                            <span class="small text-muted d-block">High Sensitivity</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stat Numbers Banner -->
+    <div class="row g-3 my-4">
+        <div class="col-md-3 col-6">
+            <div class="stat-counter-card p-3 rounded-4 bg-dark bg-opacity-75 border border-secondary border-opacity-25 text-center">
+                <i class="fa-solid fa-database fs-3 text-danger mb-2"></i>
+                <h3 class="fw-bold mb-0">1,351</h3>
+                <span class="text-secondary small">Total Pokémon Samples</span>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-counter-card p-3 rounded-4 bg-dark bg-opacity-75 border border-secondary border-opacity-25 text-center">
+                <i class="fa-solid fa-sliders fs-3 text-warning mb-2"></i>
+                <h3 class="fw-bold mb-0">10</h3>
+                <span class="text-secondary small">Analyzed Features</span>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-counter-card p-3 rounded-4 bg-dark bg-opacity-75 border border-secondary border-opacity-25 text-center">
+                <i class="fa-solid fa-brain fs-3 text-info mb-2"></i>
+                <h3 class="fw-bold mb-0">5 Models</h3>
+                <span class="text-secondary small">Benchmarked & Cross-Validated</span>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-counter-card p-3 rounded-4 bg-dark bg-opacity-75 border border-secondary border-opacity-25 text-center">
+                <i class="fa-solid fa-layer-group fs-3 text-success mb-2"></i>
+                <h3 class="fw-bold mb-0">5-Fold</h3>
+                <span class="text-secondary small">Stratified Cross-Validation</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Comparison Leaderboard -->
+    <div class="row my-5" id="metrics">
+        <div class="col-lg-8 mb-4 mb-lg-0">
+            <div class="card bg-dark bg-opacity-75 border border-secondary border-opacity-25 rounded-4 shadow-sm p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1"><i class="fa-solid fa-trophy text-warning me-2"></i>Model Benchmark Leaderboard</h4>
+                        <p class="text-secondary small mb-0">Evaluated on 5-Fold Stratified Cross-Validation (Macro F1-Score)</p>
+                    </div>
+                    <span class="badge bg-secondary bg-opacity-50 text-light px-3 py-2">Colab Cell 38</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle mb-0">
+                        <thead class="text-secondary small text-uppercase">
+                            <tr>
+                                <th>Rank</th>
+                                <th>Algorithm</th>
+                                <th>Mean Macro F1</th>
+                                <th>Standard Dev</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in data.model_comparison %}
+                            <tr class="{% if item.rank == 1 %}table-active border-danger border-start border-3{% endif %}">
+                                <td>
+                                    {% if item.rank == 1 %}
+                                        <span class="badge bg-warning text-dark"><i class="fa-solid fa-crown"></i> #1</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">#{{ item.rank }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="fw-bold text-light">
+                                    {{ item.model }}
+                                    {% if item.rank == 1 %}
+                                        <span class="badge bg-danger ms-2">Production Model</span>
+                                    {% endif %}
+                                </td>
+                                <td class="fw-bold text-danger-emphasis fs-6">{{ item.mean_f1 }}</td>
+                                <td class="text-secondary font-monospace">±{{ item.std }}</td>
+                                <td>
+                                    {% if item.rank == 1 %}
+                                        <span class="badge bg-success-subtle text-success border border-success border-opacity-25">Optimal</span>
+                                    {% elif item.rank == 2 %}
+                                        <span class="badge bg-primary-subtle text-primary border border-primary border-opacity-25">Competitive</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary-subtle text-secondary">Baseline</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hyperparameter Tuning Card -->
+        <div class="col-lg-4">
+            <div class="card bg-dark bg-opacity-75 border border-secondary border-opacity-25 rounded-4 shadow-sm p-4 h-100">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="fa-solid fa-gears text-danger fs-4"></i>
+                    <h5 class="fw-bold mb-0">Tuned Hyperparameters</h5>
+                </div>
+                <p class="text-secondary small mb-3">
+                    Optimized via <code>RandomizedSearchCV</code> across 30 iterative candidate configurations:
+                </p>
+                <ul class="list-group list-group-flush bg-transparent">
+                    <li class="list-group-item bg-transparent text-light border-secondary border-opacity-25 d-flex justify-content-between px-0 py-2">
+                        <span class="text-secondary"><i class="fa-solid fa-tree me-2 text-danger"></i>n_estimators</span>
+                        <span class="badge bg-danger font-monospace fs-6">200</span>
+                    </li>
+                    <li class="list-group-item bg-transparent text-light border-secondary border-opacity-25 d-flex justify-content-between px-0 py-2">
+                        <span class="text-secondary"><i class="fa-solid fa-arrows-split-up-and-left me-2 text-warning"></i>max_depth</span>
+                        <span class="badge bg-warning text-dark font-monospace fs-6">20</span>
+                    </li>
+                    <li class="list-group-item bg-transparent text-light border-secondary border-opacity-25 d-flex justify-content-between px-0 py-2">
+                        <span class="text-secondary"><i class="fa-solid fa-scissors me-2 text-info"></i>min_samples_split</span>
+                        <span class="badge bg-info text-dark font-monospace fs-6">5</span>
+                    </li>
+                    <li class="list-group-item bg-transparent text-light border-secondary border-opacity-25 d-flex justify-content-between px-0 py-2">
+                        <span class="text-secondary"><i class="fa-solid fa-leaf me-2 text-success"></i>min_samples_leaf</span>
+                        <span class="badge bg-success font-monospace fs-6">2</span>
+                    </li>
+                    <li class="list-group-item bg-transparent text-light border-secondary border-opacity-25 d-flex justify-content-between px-0 py-2">
+                        <span class="text-secondary"><i class="fa-solid fa-square-root-variable me-2 text-light"></i>max_features</span>
+                        <span class="badge bg-secondary font-monospace fs-6">sqrt</span>
+                    </li>
+                    <li class="list-group-item bg-transparent text-light border-secondary border-opacity-25 d-flex justify-content-between px-0 py-2">
+                        <span class="text-secondary"><i class="fa-solid fa-scale-balanced me-2 text-danger"></i>class_weight</span>
+                        <span class="badge bg-danger font-monospace fs-6">balanced</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDA & Insights Section -->
+    <div class="row my-5">
+        <div class="col-12 mb-3">
+            <h4 class="fw-bold mb-1"><i class="fa-solid fa-chart-line text-info me-2"></i>Exploratory Data Analysis (EDA) Insights</h4>
+            <p class="text-secondary small">Key findings uncovered during feature investigation and data preprocessing:</p>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="eda-card p-4 rounded-4 bg-dark bg-opacity-75 border border-secondary border-opacity-25 h-100">
+                <div class="d-flex align-items-center gap-2 mb-2 text-danger">
+                    <i class="fa-solid fa-shield-halved fs-4"></i>
+                    <h6 class="fw-bold mb-0">Attack vs. Defense</h6>
+                </div>
+                <div class="display-6 fw-bold text-light mb-2">r = 0.45</div>
+                <p class="text-secondary small mb-0">
+                    Moderate positive correlation indicates defensive Pokémon often trade off rapid offensive velocity, forming distinct physical tank vs. offensive sweeper clusters.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="eda-card p-4 rounded-4 bg-dark bg-opacity-75 border border-secondary border-opacity-25 h-100">
+                <div class="d-flex align-items-center gap-2 mb-2 text-warning">
+                    <i class="fa-solid fa-weight-scale fs-4"></i>
+                    <h6 class="fw-bold mb-0">Height vs. Weight</h6>
+                </div>
+                <div class="display-6 fw-bold text-light mb-2">r = 0.67</div>
+                <p class="text-secondary small mb-0">
+                    Strong allometric scaling power-law between Pokémon stature (decimeters) and mass (hectograms), serving as critical physical indicators for element archetypes.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="eda-card p-4 rounded-4 bg-dark bg-opacity-75 border border-secondary border-opacity-25 h-100">
+                <div class="d-flex align-items-center gap-2 mb-2 text-success">
+                    <i class="fa-solid fa-dragon fs-4"></i>
+                    <h6 class="fw-bold mb-0">Dragon Type Supremacy</h6>
+                </div>
+                <div class="display-6 fw-bold text-light mb-2">212.9 Exp</div>
+                <p class="text-secondary small mb-0">
+                    Dragon Pokémon hold the highest average Base Experience threshold (>210) and highest average Attack stat, followed closely by Steel (194.6) and Psychic (190.2).
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ML Pipeline Architecture -->
+    <div class="row my-5" id="pipeline">
+        <div class="col-12">
+            <div class="card bg-dark bg-opacity-75 border border-secondary border-opacity-25 rounded-4 shadow-sm p-4">
+                <h4 class="fw-bold mb-4"><i class="fa-solid fa-diagram-project text-danger me-2"></i>End-to-End ML Pipeline Architecture</h4>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="step-card p-3 rounded-3 bg-dark border border-secondary border-opacity-25 h-100">
+                            <span class="step-number">01</span>
+                            <h6 class="fw-bold mt-2">Data Ingestion</h6>
+                            <p class="text-secondary small mb-0">
+                                1,351 Pokémon instances loaded with 10 features: HP, Attack, Defense, Height, Weight, Base Exp, Types.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="step-card p-3 rounded-3 bg-dark border border-secondary border-opacity-25 h-100">
+                            <span class="step-number">02</span>
+                            <h6 class="fw-bold mt-2">Preprocessing</h6>
+                            <p class="text-secondary small mb-0">
+                                Median imputation for missing numeric values; IQR outlier clipping; One-Hot Encoding for categorical types.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="step-card p-3 rounded-3 bg-dark border border-secondary border-opacity-25 h-100">
+                            <span class="step-number">03</span>
+                            <h6 class="fw-bold mt-2">Feature Engineering</h6>
+                            <p class="text-secondary small mb-0">
+                                ColumnTransformer pipeline extracts 42 dense feature vectors combining scaled numericals and encoded types.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="step-card p-3 rounded-3 bg-dark border border-secondary border-opacity-25 h-100">
+                            <span class="step-number">04</span>
+                            <h6 class="fw-bold mt-2">Tuned Inference</h6>
+                            <p class="text-secondary small mb-0">
+                                Production Random Forest classifier with 200 balanced decision trees executes multi-class prediction.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action Banner -->
+    <div class="row my-5">
+        <div class="col-12 text-center py-5 rounded-4 cta-card border border-danger border-opacity-50 shadow-lg">
+            <h2 class="fw-bold text-white mb-2">Ready to Test the Model?</h2>
+            <p class="text-light text-opacity-75 mb-4">Input any Pokémon's HP, Attack, Defense, Height, Weight, and Base Exp to see real-time predictions.</p>
+            <a href="{{ url_for('predict') }}" class="btn btn-danger btn-lg px-5 rounded-pill shadow">
+                <i class="fa-solid fa-wand-magic-sparkles me-2"></i> Open Prediction Form
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

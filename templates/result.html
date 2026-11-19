@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction Result - PokéML{% endblock %}
+
+{% block content %}
+<div class="container my-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <!-- Result Top Card with Dynamic Type Gradient -->
+            <div class="result-hero-card rounded-4 p-4 p-lg-5 shadow-lg position-relative overflow-hidden mb-4 border border-secondary border-opacity-25"
+                 style="background: {{ result.predicted_type.bg }};">
+                
+                <div class="position-relative z-1 text-white">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                        <span class="badge bg-dark bg-opacity-50 text-white rounded-pill px-3 py-2 border border-light border-opacity-25">
+                            <i class="fa-solid fa-microchip text-warning me-1"></i> Random Forest Prediction Result
+                        </span>
+                        <a href="{{ url_for('predict') }}" class="btn btn-sm btn-light rounded-pill px-3 fw-bold">
+                            <i class="fa-solid fa-rotate-left me-1"></i> Predict Again
+                        </a>
+                    </div>
+
+                    <div class="row align-items-center g-4">
+                        <div class="col-md-7">
+                            <span class="text-white-50 text-uppercase fw-bold small tracking-wider">Predicted Pokémon Type</span>
+                            <div class="d-flex align-items-center gap-3 my-2">
+                                <span class="type-icon-large">{{ result.predicted_type.icon }}</span>
+                                <div>
+                                    <h1 class="display-4 fw-extrabold mb-0 text-white">{{ result.predicted_type.name }}</h1>
+                                    {% if result.secondary_type %}
+                                        <span class="badge bg-dark bg-opacity-75 rounded-pill px-3 py-1 mt-1 border border-light border-opacity-25">
+                                            Secondary Affinity: {{ result.secondary_type.icon }} {{ result.secondary_type.name }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <p class="lead text-white text-opacity-90 mt-3 mb-0" style="font-size: 1.05rem;">
+                                {{ result.predicted_type.desc }}
+                            </p>
+                        </div>
+
+                        <!-- Attack Power Tier Spotlight -->
+                        <div class="col-md-5">
+                            <div class="p-4 rounded-4 bg-dark bg-opacity-75 border border-light border-opacity-25 text-center shadow">
+                                <span class="text-secondary small text-uppercase fw-bold d-block mb-1">
+                                    <i class="fa-solid fa-burst text-danger me-1"></i> Attack Classification
+                                </span>
+                                <div class="my-2">
+                                    {% if result.attack_class == 'High' %}
+                                        <span class="badge bg-danger fs-3 px-4 py-2 rounded-pill shadow-sm">
+                                            <i class="fa-solid fa-fire me-1"></i> HIGH ATTACK
+                                        </span>
+                                    {% elif result.attack_class == 'Medium' %}
+                                        <span class="badge bg-warning text-dark fs-3 px-4 py-2 rounded-pill shadow-sm">
+                                            <i class="fa-solid fa-scale-balanced me-1"></i> MEDIUM ATTACK
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-info text-dark fs-3 px-4 py-2 rounded-pill shadow-sm">
+                                            <i class="fa-solid fa-shield-halved me-1"></i> LOW ATTACK
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="mt-2 text-light small">
+                                    Model Confidence: <strong class="text-warning">{{ result.confidence }}%</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subtle Decorative Background Pokeball -->
+                <div class="pokeball-bg-watermark"></div>
+            </div>
+
+            <!-- Two-Column Breakdown: Model Probabilities & Combat Role -->
+            <div class="row g-4 mb-4">
+                
+                <!-- Random Forest Class Probability Breakdown -->
+                <div class="col-md-6">
+                    <div class="card bg-dark bg-opacity-75 border border-secondary border-opacity-25 rounded-4 p-4 h-100 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0 text-light">
+                                <i class="fa-solid fa-chart-column text-danger me-2"></i>Class Probability Distribution
+                            </h5>
+                            <span class="badge bg-secondary font-monospace">Random Forest</span>
+                        </div>
+                        <p class="text-secondary small mb-3">
+                            Multi-class probability spread across the 3 combat tiers generated by <code>model.predict_proba()</code>:
+                        </p>
+
+                        <!-- High Tier Bar -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small fw-bold mb-1">
+                                <span class="text-danger"><i class="fa-solid fa-fire me-1"></i> High Attack Class</span>
+                                <span class="text-light">{{ result.probabilities.get('High', 0) }}%</span>
+                            </div>
+                            <div class="progress bg-dark border border-secondary border-opacity-50" style="height: 12px;">
+                                <div class="progress-bar bg-danger" role="progressbar"
+                                     style="width: {{ result.probabilities.get('High', 0) }}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Medium Tier Bar -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small fw-bold mb-1">
+                                <span class="text-warning"><i class="fa-solid fa-scale-balanced me-1"></i> Medium Attack Class</span>
+                                <span class="text-light">{{ result.probabilities.get('Medium', 0) }}%</span>
+                            </div>
+                            <div class="progress bg-dark border border-secondary border-opacity-50" style="height: 12px;">
+                                <div class="progress-bar bg-warning" role="progressbar"
+                                     style="width: {{ result.probabilities.get('Medium', 0) }}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Low Tier Bar -->
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between small fw-bold mb-1">
+                                <span class="text-info"><i class="fa-solid fa-shield-halved me-1"></i> Low Attack Class</span>
+                                <span class="text-light">{{ result.probabilities.get('Low', 0) }}%</span>
+                            </div>
+                            <div class="progress bg-dark border border-secondary border-opacity-50" style="height: 12px;">
+                                <div class="progress-bar bg-info" role="progressbar"
+                                     style="width: {{ result.probabilities.get('Low', 0) }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Combat Archetype Analysis -->
+                <div class="col-md-6">
+                    <div class="card bg-dark bg-opacity-75 border border-secondary border-opacity-25 rounded-4 p-4 h-100 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0 text-light">
+                                <i class="fa-solid fa-chess-knight text-warning me-2"></i>Combat Role & Strategy
+                            </h5>
+                            <span class="badge bg-warning text-dark">{{ result.archetype.role }}</span>
+                        </div>
+                        <p class="text-light mb-3" style="line-height: 1.6;">
+                            {{ result.archetype.desc }}
+                        </p>
+                        <div class="p-3 rounded-3 bg-dark border border-secondary border-opacity-25 mt-auto">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="fa-solid fa-compass text-danger"></i>
+                                <span class="fw-bold text-light small">Recommended Arena Strategy</span>
+                            </div>
+                            <p class="text-secondary small mb-0">
+                                {% if result.attack_class == 'High' %}
+                                    Deploy as frontline offensive breaker. Synergizes best with hazard setups and entry damage to overwhelm defensive walls.
+                                {% elif result.attack_class == 'Medium' %}
+                                    Excellent mid-game pivot. Adaptable to both offensive momentum and tactical status condition management.
+                                {% else %}
+                                    Anchor with defensive utility, recovery moves, or screen protection to support offensive sweepers.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Entered Stats vs Benchmark Card -->
+            <div class="card bg-dark bg-opacity-75 border border-secondary border-opacity-25 rounded-4 p-4 shadow-sm mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h5 class="fw-bold mb-1 text-light">
+                            <i class="fa-solid fa-chart-line text-info me-2"></i>Input Metrics vs. Pokémon Benchmarks
+                        </h5>
+                        <p class="text-secondary small mb-0">Comparison of entered values against average stats of 1,351 Pokémon records</p>
+                    </div>
+                    <span class="badge bg-secondary">Exit Exam Dataset</span>
+                </div>
+
+                <div class="row g-4">
+                    <!-- HP -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="benchmark-box p-3 rounded-3 bg-dark border border-secondary border-opacity-25">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-secondary"><i class="fa-solid fa-heart-pulse text-danger me-1"></i> HP</span>
+                                <span class="fw-bold text-light fs-5">{{ result.inputs.hp }}</span>
+                            </div>
+                            <div class="progress bg-secondary bg-opacity-25 my-2" style="height: 8px;">
+                                <div class="progress-bar bg-danger" style="width: {{ result.stat_comparisons.hp.pct }}%"></div>
+                            </div>
+                            <span class="small text-muted">Dataset Avg: 69.2</span>
+                        </div>
+                    </div>
+
+                    <!-- Attack -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="benchmark-box p-3 rounded-3 bg-dark border border-secondary border-opacity-25">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-secondary"><i class="fa-solid fa-burst text-warning me-1"></i> Attack</span>
+                                <span class="fw-bold text-light fs-5">{{ result.inputs.attack }}</span>
+                            </div>
+                            <div class="progress bg-secondary bg-opacity-25 my-2" style="height: 8px;">
+                                <div class="progress-bar bg-warning" style="width: {{ result.stat_comparisons.attack.pct }}%"></div>
+                            </div>
+                            <span class="small text-muted">Dataset Avg: 78.3</span>
+                        </div>
+                    </div>
+
+                    <!-- Defense -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="benchmark-box p-3 rounded-3 bg-dark border border-secondary border-opacity-25">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-secondary"><i class="fa-solid fa-shield text-info me-1"></i> Defence</span>
+                                <span class="fw-bold text-light fs-5">{{ result.inputs.defense }}</span>
+                            </div>
+                            <div class="progress bg-secondary bg-opacity-25 my-2" style="height: 8px;">
+                                <div class="progress-bar bg-info" style="width: {{ result.stat_comparisons.defense.pct }}%"></div>
+                            </div>
+                            <span class="small text-muted">Dataset Avg: 73.8</span>
+                        </div>
+                    </div>
+
+                    <!-- Height -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="benchmark-box p-3 rounded-3 bg-dark border border-secondary border-opacity-25">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-secondary"><i class="fa-solid fa-ruler-vertical text-success me-1"></i> Height</span>
+                                <span class="fw-bold text-light fs-5">{{ result.inputs.height }} dm</span>
+                            </div>
+                            <div class="progress bg-secondary bg-opacity-25 my-2" style="height: 8px;">
+                                <div class="progress-bar bg-success" style="width: {{ result.stat_comparisons.height_dm.pct }}%"></div>
+                            </div>
+                            <span class="small text-muted">Dataset Avg: 12.2 dm (1.22m)</span>
+                        </div>
+                    </div>
+
+                    <!-- Weight -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="benchmark-box p-3 rounded-3 bg-dark border border-secondary border-opacity-25">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-secondary"><i class="fa-solid fa-weight-hanging text-secondary me-1"></i> Weight</span>
+                                <span class="fw-bold text-light fs-5">{{ result.inputs.weight }} hg</span>
+                            </div>
+                            <div class="progress bg-secondary bg-opacity-25 my-2" style="height: 8px;">
+                                <div class="progress-bar bg-secondary" style="width: {{ result.stat_comparisons.weight_hg.pct }}%"></div>
+                            </div>
+                            <span class="small text-muted">Dataset Avg: 680.5 hg (68kg)</span>
+                        </div>
+                    </div>
+
+                    <!-- Base Experience -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="benchmark-box p-3 rounded-3 bg-dark border border-secondary border-opacity-25">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-secondary"><i class="fa-solid fa-star text-warning me-1"></i> Base Experience</span>
+                                <span class="fw-bold text-light fs-5">{{ result.inputs.base_experience }}</span>
+                            </div>
+                            <div class="progress bg-secondary bg-opacity-25 my-2" style="height: 8px;">
+                                <div class="progress-bar bg-warning" style="width: {{ result.stat_comparisons.base_experience.pct }}%"></div>
+                            </div>
+                            <span class="small text-muted">Dataset Avg: 154.2</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Navigation Buttons -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mt-4">
+                <a href="{{ url_for('predict') }}" class="btn btn-danger btn-lg px-4 rounded-pill shadow d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Predict Another Pokémon
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-light rounded-pill px-4">
+                    <i class="fa-solid fa-chart-pie me-2"></i> View Project Overview
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
