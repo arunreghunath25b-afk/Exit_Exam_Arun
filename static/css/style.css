@@ -1,0 +1,231 @@
+/* ==========================================================================
+   PokéML Studio - Modern Stylesheet
+   ========================================================================== */
+
+:root {
+    --bg-dark-primary: #0f1117;
+    --bg-dark-card: #181c24;
+    --bg-dark-accent: #222733;
+    --pokemon-red: #ee1515;
+    --pokemon-red-dark: #b80d0d;
+    --pokemon-gold: #f7d02c;
+    --pokemon-blue: #3b4cca;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+}
+
+body.bg-dark-pokemon {
+    background-color: var(--bg-dark-primary);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, .brand-text {
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.text-gradient-pokemon {
+    background: linear-gradient(135deg, #ff4b4b, #ff7675, #fab1a0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Pokéball animated and static icons */
+.pokeball-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(to bottom, #ee1515 50%, #ffffff 50%);
+    border-radius: 50%;
+    border: 3px solid #111;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    box-shadow: 0 0 10px rgba(238, 21, 21, 0.4);
+}
+
+.pokeball-icon::before {
+    content: '';
+    position: absolute;
+    top: calc(50% - 2px);
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: #111;
+}
+
+.pokeball-icon::after {
+    content: '';
+    position: absolute;
+    top: calc(50% - 5px);
+    left: calc(50% - 5px);
+    width: 10px;
+    height: 10px;
+    background-color: #fff;
+    border: 3px solid #111;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+.pokeball-icon-sm {
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(to bottom, #ee1515 50%, #ffffff 50%);
+    border-radius: 50%;
+    border: 2px solid #111;
+    position: relative;
+    display: inline-block;
+}
+
+.pokeball-icon-sm::before {
+    content: '';
+    position: absolute;
+    top: calc(50% - 1.5px);
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #111;
+}
+
+.pokeball-icon-sm::after {
+    content: '';
+    position: absolute;
+    top: calc(50% - 3.5px);
+    left: calc(50% - 3.5px);
+    width: 7px;
+    height: 7px;
+    background-color: #fff;
+    border: 2px solid #111;
+    border-radius: 50%;
+}
+
+/* Nav & Footer */
+.bg-pokemon-nav {
+    background-color: rgba(15, 17, 23, 0.95) !important;
+    backdrop-filter: blur(12px);
+}
+
+.bg-pokemon-footer {
+    background-color: #0b0d12;
+}
+
+/* Hero Cards & Glassmorphism */
+.hero-card {
+    background: radial-gradient(circle at top right, rgba(238, 21, 21, 0.15), transparent 70%),
+                linear-gradient(180deg, #181c24 0%, #12151c 100%);
+    border: 1px solid rgba(238, 21, 21, 0.2);
+}
+
+.pokedex-glass-card {
+    background: rgba(24, 28, 36, 0.7);
+    backdrop-filter: blur(16px);
+}
+
+.stat-counter-card {
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.stat-counter-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(238, 21, 21, 0.4) !important;
+}
+
+.step-card {
+    position: relative;
+    transition: transform 0.2s ease;
+}
+
+.step-card:hover {
+    transform: translateY(-2px);
+}
+
+.step-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+    font-family: 'Space Grotesk', sans-serif;
+    color: rgba(238, 21, 21, 0.6);
+}
+
+.cta-card {
+    background: linear-gradient(135deg, rgba(238, 21, 21, 0.15), rgba(59, 76, 202, 0.15)), #181c24;
+}
+
+/* Form Controls */
+.form-control-lg, .form-select {
+    border-radius: 12px;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #1e2430 !important;
+    color: #fff !important;
+    border-color: #ee1515 !important;
+    box-shadow: 0 0 0 0.25rem rgba(238, 21, 21, 0.25) !important;
+}
+
+/* Presets Toolbar */
+.preset-btn {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+}
+
+.preset-btn:hover {
+    background-color: var(--pokemon-red) !important;
+    border-color: var(--pokemon-red) !important;
+    color: #fff !important;
+    transform: scale(1.04);
+}
+
+/* Result Page Styling */
+.result-hero-card {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.type-icon-large {
+    font-size: 3.5rem;
+    line-height: 1;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+}
+
+.pokeball-bg-watermark {
+    position: absolute;
+    right: -40px;
+    bottom: -40px;
+    width: 260px;
+    height: 260px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.benchmark-box {
+    background-color: rgba(20, 24, 32, 0.8);
+    transition: border-color 0.2s ease;
+}
+
+.benchmark-box:hover {
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #0f1117;
+}
+::-webkit-scrollbar-thumb {
+    background: #2a3040;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #ee1515;
+}
